@@ -7,4 +7,4 @@ wezterm settings
 
 ##Windows Install
  clone to wsl ~/my_wezterm/
- create symlink c:\Users\usersname\.wezterm.lua from ~/my_wezterm/.wezterm.lua
+ copy to c:\Users\usersname\.wezterm.lua from ~/my_wezterm/.wezterm.lua
