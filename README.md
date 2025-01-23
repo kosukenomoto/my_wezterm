@@ -2,9 +2,9 @@
 wezterm settings
 
 ##Linux Install
-clone to ~/.wezterm
- *then Wezterm load configfile(~/.wezterm/wezterm.lua)
+ clone to ~/my_wezterm/
+ create symlink ~/.wezterm.lua from ~/my_wezterm/.wezterm.lua
 
 ##Windows Install
- clone to wsl (~/.config/wezterm) 
- create symlink to c:\Users\usersname\.wezterm.lua
+ clone to wsl ~/my_wezterm/
+ create symlink c:\Users\usersname\.wezterm.lua from ~/my_wezterm/.wezterm.lua
