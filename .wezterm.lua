@@ -6,9 +6,11 @@ config.color_scheme = 'Ayu Dark (Gogh)'
 config.font_size = 14.0
 
 -- 背景の非透過率（1なら完全に透過させない）
-config.window_background_opacity = 0.85
--- 背景をぼかす
-config.macos_window_background_blur = 20
+config.window_background_opacity = 0.92
+-- もしLinuxならこちら（Waylandの場合のみ）
+config.window_background_blur = 99
+-- 他にもオプションを組み合わせるときれいになるよ
+config.enable_wayland = true -- Linux Waylandなら有効にしておく
 
 config.window_decorations = 'RESIZE'
 config.window_padding = {
