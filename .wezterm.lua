@@ -4,11 +4,11 @@ local config = {}
 config.font = wezterm.font 'UDEV Gothic NF'
 config.color_scheme = 'Ayu Dark (Gogh)'
 config.font_size = 14.0
+config.initial_rows = 40
+config.initial_cols = 120 
 
 -- 背景の非透過率（1なら完全に透過させない）
 config.window_background_opacity = 0.92
--- もしLinuxならこちら（Waylandの場合のみ）
-config.window_background_blur = 99
 -- 他にもオプションを組み合わせるときれいになるよ
 config.enable_wayland = true -- Linux Waylandなら有効にしておく
 
@@ -19,7 +19,6 @@ config.window_padding = {
   top = 0,
   bottom = 0,
 }
-
 
 wezterm.on('update-right-status', function(window, pane)
   -- "Wed Mar 3 08:14"
@@ -33,11 +32,19 @@ wezterm.on('update-right-status', function(window, pane)
   })
 end)
 
+-- フォントサイズ変更関数を返すユーティリティ
+local function set_font_size(size)
+  return wezterm.action_callback(function(window, pane)
+    local overrides = window:get_config_overrides() or {}
+    overrides.font_size = size
+    window:set_config_overrides(overrides)
+  end)
+end
+
 local act = wezterm.action
 config.keys = {
-  { key = ',', mods = 'CTRL|ALT', action = act.ActivateTabRelative(-1) },
-  { key = '.', mods = 'CTRL|ALT', action = act.ActivateTabRelative(1) },
-  { key = 'm', mods = 'CTRL|ALT', action = act.SpawnTab('CurrentPaneDomain') },
+  { key = '9', mods = 'ALT|CTRL', action = set_font_size(18) },
+  { key = '0', mods = 'ALT|CTRL', action = set_font_size(14) },
 }
 
 return config
