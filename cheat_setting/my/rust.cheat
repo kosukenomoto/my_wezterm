@@ -1,0 +1,19 @@
+% rust
+
+# アップデート
+rustup update
+
+# アンインストール
+rustup self uninstall
+
+# ビルド
+rustc main.rs
+
+# cargo new project
+cargo new new_project
+
+# cargo biuld
+cargo build
+
+# 依存クレートの提供するドキュメントをビルドしてブラウザでオープン
+cargo doc --open

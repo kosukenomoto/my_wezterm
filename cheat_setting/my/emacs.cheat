@@ -1,0 +1,25 @@
+% emacs
+
+# ペインの移動
+C-allowkey
+
+# kill buffer
+C-x k
+
+# テキスト選択
+C-[Space] cursormove
+
+# テキスト矩形選択
+C-x [Space] cursormove
+
+# テキスト全選択
+C-x h
+
+# カーソルより下の範囲で正規表現検索
+C-M-s
+
+# 逐次置換
+M-%
+
+# 正規表現で逐次置換
+C-M-%
