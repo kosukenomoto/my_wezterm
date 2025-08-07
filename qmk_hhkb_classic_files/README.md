@@ -13,6 +13,12 @@
   - original hhkb classic のfirmwareを保管
 
 ## how to write dapboot
+- https://geekhack.org/index.php?topic=106213.0
+  - ここの情報を元にHHKBの裏蓋を開けて　R6 R85 をショートさせながらUSBをPC接続することでSTM32のDFUが起動する。
+  - 起動後はショートは解除してOK
+  - 以下のコマンドでdapbootを書き込む。（hhkbclassicのオリジナルのファームウェアはこのドキュメントの最後尾を参照。
+  - （まず最初にやっておいたほうがいいです）
+
 ```
 dfu-util -a 0 -s 0x08000000:leave -D dapboot.bin
 ```
