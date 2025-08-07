@@ -36,6 +36,11 @@ qmk build -kb hhkb/classic/dapboot -km duncaen
   - dapboodをlsusbでみてdapbootを認識していなければだめ。
   - lshift rshift esc を同時押しでdapbood-dfuを起動できる
 
+## WebUSB DFUを使わない方法
+sudo dfu-utilで起動したdapbood-dfuを見てみる
+<img width="1389" height="337" alt="image" src="https://github.com/user-attachments/assets/849dcd54-583a-47af-923f-378073555b2b" />
+
+
 ## そのほかメモoriginal hhkb firmwareの取得方法
 - hhkb-eeprom.bin
 - hhkb-opt.bin
