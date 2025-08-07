@@ -1,7 +1,7 @@
 # HHKB Classic Firmware update
 
-https://github.com/Duncaen/qmk_firmware/tree/hhkb_classic
-https://github.com/Duncaen/dapboot/tree/hhkb
+- https://github.com/Duncaen/qmk_firmware/tree/hhkb_classic
+- https://github.com/Duncaen/dapboot/tree/hhkb
 ```bash
 git clone -b hhkb_classic https://github.com/Duncaen/qmk_firmware.git qmk_firmware_hhkbclassic
 git submodule sync --recursive  
