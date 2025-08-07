@@ -2,13 +2,14 @@
 
 https://github.com/Duncaen/qmk_firmware/tree/hhkb_classic
 https://github.com/Duncaen/dapboot/tree/hhkb
-
+```bash
 git clone -b hhkb_classic https://github.com/Duncaen/qmk_firmware.git qmk_firmware_hhkbclassic
 git submodule sync --recursive  
 git submodule update --init --recursive  
 ./util/docker_build.sh hhkb/classic/dapboot:duncaen 
 or 
 qmk build -kb hhkb/classic/dapboot -km duncaen
+```
 
 ## 保管してるファイル
 file:dapboot.bin
