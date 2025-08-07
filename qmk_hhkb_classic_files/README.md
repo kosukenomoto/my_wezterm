@@ -3,7 +3,9 @@
 ## 保管してるファイル
 - file:dapboot.bin
   - https://github.com/Duncaen/dapboot/tree/hhkb
-  - ビルド済みdapboot (STM用dfuをhhkb用にカスタムしたもの）
+  - 上記ビルド済みdapboot (STM用dfuをhhkb用にカスタムしたもの）
+  - ビルドしたければdapboot/src配下で以下コマンドを実行(armビルドのためのtoolchainは個別インストールが必要）
+    ```make TARGET=HHKB```
   - 以下にも格納しているが、こっちを利用するほうがいい。（自分でビルドした）
 
 - file:hogehoge.tar.gz
