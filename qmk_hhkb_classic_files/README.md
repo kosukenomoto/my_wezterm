@@ -29,14 +29,14 @@ dfu-util -a 0 -s 0x08000000:leave -D dapboot.bin
 
 ## qmk hhkb_classic dapboot版のビルド
 以下のコマンドでdockerbuild
-- https://github.com/Duncaen/qmk_firmware/tree/hhkb_classic
+- original https://github.com/Duncaen/qmk_firmware/tree/hhkb_classic
+- myconfig https://github.com/kosukenomoto/qmk_firmware_for_hhkbclassic
+
 ```bash
-git clone -b hhkb_classic https://github.com/Duncaen/qmk_firmware.git qmk_firmware_hhkbclassic
+git clone myconfig https://github.com/kosukenomoto/qmk_firmware_for_hhkbclassic qmk_firmware_hhkbclassic
 git submodule sync --recursive  
 git submodule update --init --recursive  
-./util/docker_build.sh hhkb/classic/dapboot:duncaen 
-or 
-qmk build -kb hhkb/classic/dapboot -km duncaen
+./util/docker_build.sh hhkb/classic/dapboot:20250808
 ```
 
 ## WebUSB DFU
