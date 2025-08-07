@@ -6,14 +6,17 @@
   - ビルド済みdapboot (STM用dfuをhhkb用にカスタムしたもの）
   - 以下にも格納しているが、こっちを利用するほうがいい。（自分でビルドした）
 
-- file:./firmware
+- file:hogehoge.tar.gz
   - original hhkb classic のfirmwareを保管
 
 ## how to write dapboot
+```
 dfu-util -a 0 -s 0x08000000:leave -D dapboot.bin
-書き込み直後はdfudapbootが起動しっぱなしになるが気にせず、
-webUSB DFUでdapboot版qmkをwriteするとqmkが作動する。
-（そして左右シフト＋escでdapbootdfu起動するようになる）
+```
+
+ - 書き込み直後はdfudapbootが起動しっぱなしになるが気にしない。
+ - webUSB DFUでdapboot版qmkをwriteするとqmkが作動する。
+ - そして左右シフト＋escでdapbootdfu起動するようになる
 
 ## qmk hhkb_classic dapboot版のビルド
 以下のコマンドでdockerbuild
