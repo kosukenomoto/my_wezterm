@@ -8,7 +8,6 @@
     ```
     make TARGET=HHKB
     ```
-  - 以下にも格納しているが、こっちを利用するほうがいい。（自分でビルドした）
 
 - file:hogehoge.tar.gz
   - original hhkb classic のfirmwareを保管
