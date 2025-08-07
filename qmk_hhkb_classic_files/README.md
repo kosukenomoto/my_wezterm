@@ -41,6 +41,7 @@ sudo dfu-utilで起動したdapbood-dfuを見てみる
 <img width="1389" height="337" alt="image" src="https://github.com/user-attachments/assets/849dcd54-583a-47af-923f-378073555b2b" />
 以下でデバイスの指定をして書き込み
 <img width="790" height="569" alt="image" src="https://github.com/user-attachments/assets/959ca1ae-b878-481b-8a33-65a0b1f9bcff" />
+/etc/UDEVにルール加えればsudoでなくてもいけるのかも？
 
 ## そのほかメモoriginal hhkb firmwareの取得方法
 - hhkb-eeprom.bin
