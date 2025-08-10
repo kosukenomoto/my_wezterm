@@ -3,11 +3,13 @@
 ;;; Early UI tweaks ----------------------------------------------------------
 (setq inhibit-startup-screen t)
 
+(setq vc-follow-symlinks t)
+(setq ring-bell-function 'ignore)
+
 (menu-bar-mode -1)
 (line-number-mode 1)
 (column-number-mode 1)
 (display-battery-mode 1)
-(setq ring-bell-function 'ignore)
 (global-display-line-numbers-mode 1)
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
@@ -47,21 +49,22 @@
   :config
   (beacon-mode 1))
 
-(setq wl-copy-process nil)
-(defun wl-copy (text)
-  (setq wl-copy-process (make-process :name "wl-copy"
-                                      :buffer nil
-                                      :command '("wl-copy" "-f" "-n")
-                                      :connection-type 'pipe
-                                      :noquery t))
-  (process-send-string wl-copy-process text)
-  (process-send-eof wl-copy-process))
-(defun wl-paste ()
-  (if (and wl-copy-process (process-live-p wl-copy-process))
-      nil ; should return nil if we're the current paste owner
-      (shell-command-to-string "wl-paste -n | tr -d \r")))
-(setq interprogram-cut-function 'wl-copy)
-(setq interprogram-paste-function 'wl-paste)
+;;;;GUI system only
+;;;;(setq wl-copy-process nil)
+;;(defun wl-copy (text)
+;;  (setq wl-copy-process (make-process :name "wl-copy"
+;;                                      :buffer nil
+;;                                      :command '("wl-copy" "-f" "-n")
+;;                                      :connection-type 'pipe
+;;                                      :noquery t))
+;;  (process-send-string wl-copy-process text)
+;;  (process-send-eof wl-copy-process))
+;;(defun wl-paste ()
+;;  (if (and wl-copy-process (process-live-p wl-copy-process))
+;;      nil ; should return nil if we're the current paste owner
+;;      (shell-command-to-string "wl-paste -n | tr -d \r")))
+;;(setq interprogram-cut-function 'wl-copy)
+;;(setq interprogram-paste-function 'wl-paste)
 
 ;; Completion stack ---------------------------------------------------------
 (use-package vertico
@@ -159,10 +162,10 @@
 (global-set-key (kbd "M-\= ") 'split-window-right) ;; 縦分割
 (global-set-key (kbd "M-\- ") 'split-window-below) ;; 横分割
 (windmove-default-keybindings 'control)
-(dolist (pair '(("M-<left>"  . shrink-window-horizontally)
-                ("M-<right>" . enlarge-window-horizontally)
-                ("M-<up>"    . enlarge-window)
-                ("M-<down>"  . shrink-window)))
+(dolist (pair '(("C-S-<left>"  . shrink-window-horizontally)
+                ("C-S-<right>" . enlarge-window-horizontally)
+                ("C-S-<up>"    . enlarge-window)
+                ("C-S-<down>"  . shrink-window)))
   (keymap-set global-map (car pair) (cdr pair)))
 
 (provide 'init)
