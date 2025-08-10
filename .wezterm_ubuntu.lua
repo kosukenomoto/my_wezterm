@@ -7,6 +7,18 @@ config.font_size = 14.0
 config.initial_rows = 40
 config.initial_cols = 120 
 
+config.audible_bell = "Disabled"
+config.visual_bell = {
+  fade_in_function = 'EaseIn',
+  fade_in_duration_ms = 150,
+  fade_out_function = 'EaseOut',
+  fade_out_duration_ms = 150,
+}
+config.colors = {
+  visual_bell = '#202020',
+}
+
+
 -- 背景の非透過率（1なら完全に透過させない）
 config.window_background_opacity = 0.92
 -- 他にもオプションを組み合わせるときれいになるよ
