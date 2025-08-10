@@ -2,15 +2,12 @@
 
 ;;; Early UI tweaks ----------------------------------------------------------
 (setq inhibit-startup-screen t)
-      
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
 
+(menu-bar-mode -1)
 (line-number-mode 1)
 (column-number-mode 1)
 (display-battery-mode 1)
-
+(setq ring-bell-function 'ignore)
 (global-display-line-numbers-mode 1)
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
@@ -97,14 +94,6 @@
         recentf-max-menu-items 200)
   (recentf-mode 1))
 
-;; dirvish -------------------------------------------------------------------
-
-(use-package vterm
-  :ensure t
-  :custom
-  (vterm-max-scrollback 10000)
-  (vterm-shell "/usr/bin/bash"))  ;; 好きなシェル
-
 ;;; Programming tools --------------------------------------------------------
 
 ;(dolist (element treesit-language-source-alist)
@@ -177,3 +166,15 @@
   (keymap-set global-map (car pair) (cdr pair)))
 
 (provide 'init)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
