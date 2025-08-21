@@ -1,0 +1,99 @@
+;;; ───────────────────────────────────────────
+;;;  trial.kbd ― Space→矢印 / ,→記号 の最小例
+;;; ───────────────────────────────────────────
+
+;; 1. 必須セクション。今回は特別なオプション不要だが
+;;    unmapped キーをそのまま通すために下記を付ける
+;; devicehwidsは何かしら指定すればログに出てくるから、最初は適当でよい。
+;;（ろぐに入力したデバイスのIDはしゅつりょくされるのでそこからしゅとく）  
+(defcfg
+  process-unmapped-keys yes
+  windows-interception-keyboard-hwids ("72, 0, 73, 0, 68, 0, 92, 0, 86, 0, 73, 0, 68, 0, 95, 0, 49, 0, 65, 0, 56, 0, 49, 0, 38, 0, 80, 0, 73, 0, 68, 0, 95, 0, 50, 0, 48, 0, 54, 0, 55, 0, 38, 0, 82, 0, 69, 0, 86, 0, 95, 0, 48, 0, 48, 0, 54, 0, 55, 0, 38, 0, 77, 0, 73, 0, 95, 0, 48, 0, 48, 0, 0, 0, 72, 0, 73, 0, 68, 0, 92, 0, 86, 0, 73, 0, 68, 0, 95, 0, 49, 0, 65, 0, 56, 0, 49, 0, 38, 0, 80, 0, 73, 0, 68, 0, 95, 0, 50, 0, 48, 0, 54, 0, 55, 0, 38, 0, 77, 0, 73, 0, 95, 0, 48, 0, 48, 0, 0, 0, 72, 0, 73, 0, 68, 0, 92, 0, 86, 0, 73, 0, 68, 0, 95, 0, 49, 0, 65, 0, 56, 0, 49, 0, 38, 0, 85, 0, 80, 0, 58, 0, 48, 0, 48, 0, 48, 0, 49, 0, 95, 0, 85, 0, 58, 0, 48, 0, 48, 0, 48, 0, 54, 0, 0, 0, 72, 0, 73, 0, 68, 0, 95, 0, 68, 0, 69, 0, 86, 0, 73, 0, 67, 0, 69, 0, 95, 0, 83, 0, 89, 0, 83, 0, 84, 0, 69, 0, 77, 0, 95, 0, 75, 0, 69, 0, 89, 0, 66, 0, 79, 0, 65, 0, 82, 0, 68, 0, 0, 0, 72, 0, 73, 0, 68, 0, 95, 0, 68, 0, 69, 0, 86, 0, 73, 0, 67, 0, 69, 0, 95, 0, 85, 0, 80, 0, 58, 0, 48, 0, 48, 0, 48, 0, 49, 0, 95, 0, 85, 0, 58, 0, 48, 0, 48, 0, 48, 0, 54, 0, 0, 0, 72, 0, 73, 0, 68, 0, 95, 0, 68, 0, 69, 0, 86, 0, 73, 0, 67, 0, 69, 0, 0, 0")
+
+)
+
+;; 2. “物理キーの並び” を列挙（この８キーしか触らない）
+(defsrc
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+  caps a    s    d    f    g    h    j    k    l    ;    '    ret
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft
+  lctl lmet lalt           spc            ralt rmet rctl
+)
+
+;; 3. エイリアス ── Tap-Hold でレイヤを呼び出す
+(defalias
+  asla (tap-hold 115 115 / lalt)
+
+  ;; Space: 110 ms 未満で Space、200 ms 以上で nav レイヤを
+  ;; 「押している間だけ」オン　(layer-while-held <layer>)
+  fspc   (tap-hold 125 125 spc (layer-while-held navi))
+
+  ;; Comma: 110 ms 未満で ','、長押しで sym レイヤ
+  fcom (tap-hold 125 125 ,   (layer-while-held sym))
+
+  fnav (tap-hold 125 125 f (layer-while-held fnavi))
+  fright (macro right right right right)
+  fup (macro up up up up)
+  fdown (macro down down down  down)
+  fleft (macro left left left left)
+  fbspc (macro bspc bspc bspc bspc)
+
+  enav (tap-hold 125 125 esc (layer-while-held enavi))
+  fdot (tap-hold 125 125 . (layer-while-held fn))
+  
+)
+
+;; 4. 基本レイヤ
+(deflayer base
+  grv   1     2     3     4     5     6     7     8     9     0     -     =     bspc
+  tab   q     w     e     r     t     y     u     i     o     p     [     ]     \
+  lctl  a     s     d     f     g     h     j     k     l     ;     '     ret
+  lsft  z     x     c     v     b     n     m     @fcom @fdot @asla rsft
+  lctl  lmet  lalt  @fspc ralt  rmet  rctl
+)
+
+;; 5-A. Space 長押し中だけ有効になる “矢印” レイヤ
+(deflayer navi
+  grv   1     2     3     4     5     6     7     8     9      0    -     =     bspc
+  M-S-s q     A-F4  @enav M-d   t     S-tab home  up    end    tab  [     ]     \
+  lctl  lalt  lsft  del   @fnav lmet  bspc  left  down  right  ret  '     ret
+  lsft  1     2     3     4     5     6     7     8     9      0    rsft
+  lctl  lmet  lalt  @fspc ralt  rmet  rctl
+)
+
+;; 5-A. Space+E 長押し中だけ有効になる “矢印” レイヤ
+(deflayer enavi
+  grv   1     2     3     4     5     6     7      8     9      0    -    =    bspc
+  tab   q     A-F4  @enav r     t     y     C-home pgup  C-end  p    [    ]    \
+  lctl  lalt  lsft  del   @fnav lmet  bspc  C-pgup pgdn  C-pgdn ret  '    ret
+  lsft  1     2     3     4     5     6     7      8     9      0    rsft
+  lctl  lmet  lalt  @fspc ralt  rmet  rctl
+)
+                     
+;; 5-A. Space+F 長押し中だけ有効になる “矢印” レイヤ
+(deflayer fnavi
+  grv   1     2     3     4     5     6      7      8      9       0    -    =    bspc
+  tab   q     A-F4  esc   r     t     y      home   @fup   end     p    [    ]    \
+  lctl  lalt  lsft  del   @fnav lmet  @fbspc @fleft @fdown @fright ret  '    ret
+  lsft  1     2     3     4     5     6      7      8      9       0    rsft
+  lctl  lmet  lalt  @fspc ralt  rmet  rctl
+)
+
+;; 5-B. Comma 長押し中だけ有効になる “記号” レイヤ
+(deflayer sym
+  grv   1     2     3     4    5      6     7     8     9     0     -     =     bspc
+  tab   S-1   S-2   S-3   S-4  S-5    y     u     i     o     p     [     ]     \
+  lctl  S--   +     =     S-8  S-6    h     j     k     l     ;     '     ret
+  lsft  \     S-7   S-\   grv  S-grv  n     S-spc @fcom caps  /     rsft
+  caps  lmet  lalt  @fspc ralt rmet   rctl
+)
+
+;; 4. 基本レイヤ
+(deflayer fn
+  grv   1     2     3     4     5     6     7     8     9     0     -     =     bspc
+  tab   q     w     e     r     t     y     u     i     o     p     [     ]     \
+  lctl  F1    F2    F3    F4    F5    h     j     k     l     ;     '     ret
+  lsft  F6    F7    F8    F9    F10   F11   F12   @fcom @fdot /     rsft
+  lctl  lmet  lalt  @fspc ralt  rmet  rctl
+)
