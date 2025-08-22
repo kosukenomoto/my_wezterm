@@ -2,6 +2,7 @@
 
 ;;; Early UI tweaks ----------------------------------------------------------
 (setq inhibit-startup-screen t)
+(setq-default truncate-lines t)
 
 (setq vc-follow-symlinks t)
 (setq ring-bell-function 'ignore)
@@ -124,6 +125,12 @@
                           ;; 必要なら追加の設定をここに書けます
                           (message "rust-ts-mode activated")))
 )
+
+(add-hook 'rust-ts-mode-hook
+          (lambda ()
+            (electric-pair-local-mode 1)))
+
+
 ;; Rustファイル保存時に自動でフォーマット
 (add-hook 'rust-ts-mode-hook
           (lambda ()
