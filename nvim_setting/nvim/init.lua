@@ -1,3 +1,10 @@
+--
+-- WorkFlow
+-- Oil close:C-c 起動:Spc->o (開いてるファイルをカレントに）
+-- Telescope
+-- Telescope session-lens close:C-c 起動:Spc->fs 
+-- toggleterm close:exit 起動:tt (開いてるファイルをカレントに）
+--
 vim.cmd("autocmd!")
 vim.scriptencoding="utf-8"
 local options = {
@@ -31,8 +38,8 @@ local options = {
   ignorecase = true,
   -- モード（INSERTなど）を表示
   showmode = true,
-  -- 常にタブラインを表示
-  showtabline = 2,
+  -- 常にタブラインを非表示
+  showtabline = 0,
   -- 大文字が含まれている場合のみ、大文字と小文字を区別して検索
   smartcase = true,
   -- スマートインデントを有効に
@@ -61,32 +68,94 @@ local options = {
   -- 横スクロールのオフセットを設定
   sidescrolloff = 8,
   sessionoptions = { "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions" },
-  whichwrap = "b,s,h,l,[,],<,>"
+  whichwrap = "b,s,h,l,[,],<,>",
+  -- statusLineのアクティブ／非アクティブのfiller文字
+  fillchars = { stl = "─", stlnc = "─",},
 }
 for k, v in pairs(options) do
         vim.opt[k] = v
 end
 
--- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
+-- window height control function
+local term_ratios = {0.1, 0.5, 0.8}  -- 全体に対する割合
+local current_index = 1
+
+-- local function cycle_term_height()
+--   local total_height = vim.api.nvim_list_uis()[1].height
+--   current_index = current_index % #term_ratios + 1
+--   local new_height = math.floor(total_height * term_ratios[current_index])
+--   vim.cmd("resize " .. new_height)
+--   vim.notify(string.format("Terminal height: %d (%d%%)", new_height, term_ratios[current_index] * 100))
+-- end
+
+local function cycle_term_height()
+  local ui = vim.api.nvim_list_uis()[1]
+  if not ui then return end
+
+  current_index = current_index % #term_ratios + 1
+  local new_height = math.floor(ui.height * term_ratios[current_index])
+
+  local win = vim.api.nvim_get_current_win()
+
+  -- 1) 目的の高さにする
+  vim.cmd("resize " .. new_height)
+
+  -- 2) このウィンドウの高さを固定してから equalize
+  vim.api.nvim_win_set_option(win, "winfixheight", true)
+  vim.cmd("wincmd =")
+  vim.api.nvim_win_set_option(win, "winfixheight", false)
+
+  vim.notify(string.format("Terminal height: %d (%d%%)", new_height, term_ratios[current_index] * 100))
 end
-vim.opt.rtp:prepend(lazypath)
+
+-- ── helper: そのバッファに紐づく LSP の root_dir を取得（最初の1つ）
+local function lsp_root_dir(bufnr)
+  local clients = vim.lsp.get_clients({ bufnr = bufnr })
+  if not clients or #clients == 0 then return nil end
+  return clients[1].root_dir
+      or (clients[1].config and clients[1].config.root_dir)
+      or (clients[1].workspace_folders and clients[1].workspace_folders[1]
+          and vim.uri_to_fname(clients[1].workspace_folders[1].uri))
+end
+
+-- ── helper: root を基準に相対パスを作る（なければ nil）
+local function relpath_from_root(abs_path, root)
+  if not root or root == "" then return nil end
+  -- Neovim 0.11 には vim.fs.relpath あり
+  local ok, rel = pcall(vim.fs.relpath, abs_path, root)
+  if ok and rel and rel ~= "" then return rel end
+  -- 安全フォールバック：前方一致で手作業
+  local norm_root = root:gsub("[/\\]+$", "")
+  if abs_path:sub(1, #norm_root) == norm_root then
+    local sep = abs_path:sub(#norm_root + 1, #norm_root + 1)
+    local off = (sep == "/" or sep == "\\") and 2 or 1
+    return abs_path:sub(#norm_root + off)
+  end
+  return nil
+end
+
+-- ── lualine 用カスタムコンポーネント
+local function project_plus_path()
+  local buf   = vim.api.nvim_get_current_buf()
+  local file  = vim.api.nvim_buf_get_name(buf)
+  if file == "" then return "" end
+
+  local root = lsp_root_dir(buf)
+  if root and root ~= "" then
+    local proj = vim.fs.basename(root)                  -- Project名 = root のディレクトリ名
+    local rel  = relpath_from_root(file, root) or file  -- 相対にできなければフルパス
+    -- 形式: [Project名](プロジェクトルート名)+ 相対パス
+    return string.format("[%s] %s", proj, rel)
+  end
+
+  -- LSPが無い場合はフルパス
+  return file
+end
 
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
+--  Oil->Terminal
 local opts = { noremap = true, silent = true }
 --local keymap = vim.keymap
 local keymap = vim.api.nvim_set_keymap
@@ -97,18 +166,21 @@ vim.g.maplocalleader = "\\"
 -- ESC二回押しでハイライトを消す
 keymap("n", "<Esc><Esc>", ":<C-u>set nohlsearch<Return>", opts)
 -- jjでesc
+vim.keymap.set("i", "<C-w><C-w>", cycle_term_height, opts) 
 keymap("i", "jj", "<ESC>", opts)
+vim.keymap.set("n", "<C-w><C-w>", cycle_term_height, opts) 
+vim.keymap.set('n', '<leader>Q', '<Cmd>qa!<CR>', { desc = 'Quit all without saving' })
+keymap("n", "<leader>w", ":w<cr>", opts)
 keymap("n", "<leader>e", "<cmd>Neotree toggle<cr>", opts)
 keymap("n", "<leader>o", "<cmd>Oil<cr>", opts)
 keymap("n", "<leader>fs", "<cmd>Telescope session-lens<cr>", opts)
 keymap("n", "<leader>ff", "<cmd>Telescope find_files<cr>", opts)
 keymap("n", "<leader>fo", "<cmd>Telescope oldfiles<cr>", opts)
-keymap("n", "<leader>fb", "<cmd>Telescope oldfiles<cr>", opts)
+keymap("n", "<leader>fb", "<cmd>Telescope buffers<cr>", opts)
 -- terminal
--- keymap("n", "tt", ":ToggleTerm<CR>", opts)
 vim.keymap.set("n", "tt", function()
   local dir = vim.fn.fnameescape(vim.fn.expand("%:p:h"))
-  vim.cmd("ToggleTerm direction=horizontal dir=" .. dir)
+  vim.cmd("ToggleTerm dir=" .. dir)
 end, opts)
 -- Split window
 keymap("n", "ss", ":split<Return><C-w>w", opts)
@@ -126,6 +198,7 @@ keymap("n", "<C-w>k", "<CMD>wincmd k<CR>", opts)
 keymap("n", "<C-w>l", "<CMD>wincmd l<CR>", opts)
 keymap("n", "<C-w>e", "<CMD>WinResizerStartResize<CR>", opts)
 -- arrow move(terminal)
+vim.keymap.set("t", "<C-w><C-w>", cycle_term_height, opts) 
 keymap("t", "<Esc>", "<C-\\><C-n>", opts)
 keymap("t", "<C-w>c", "<CMD>close<CR>", opts)
 keymap("t", "<C-w>j", "<CMD>wincmd j<CR>", opts)
@@ -162,6 +235,23 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
+end
+vim.opt.rtp:prepend(lazypath)
+
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
@@ -180,7 +270,51 @@ require("lazy").setup({
           }
         })
         vim.cmd.colorscheme("catppuccin")
-      end,
+      end
+    },
+    {
+      'nvim-lualine/lualine.nvim',
+      dependencies = { 'nvim-tree/nvim-web-devicons'},
+      config = function()
+        require('lualine').setup({
+          options = {
+            theme = 'molokai',
+          },
+          -- inactive_winbar = {
+          --   lualine_a = { {'mode'}},
+          --   lualine_b = {'branch', 'diff', 'diagnostics'},
+          --   lualine_c = { {'filename', path = 3 }},
+          --   lualine_x = {'encoding', 'fileformat', 'filetype'},
+          --   lualine_y = {'progress'},
+          --   lualine_z = {'location'}
+          -- },
+          -- winbar = {
+          --   lualine_a = { {'mode'}},
+          --   lualine_b = {'branch', 'diff', 'diagnostics'},
+          --   lualine_c = { {'filename', path = 3 }},
+          --   lualine_x = {'encoding', 'fileformat', 'filetype'},
+          --   lualine_y = {'progress'},
+          --   lualine_z = {'location'}
+          -- },
+          winbar ={},
+          sections = {
+            lualine_a = { {'mode'}},
+            lualine_b = {'branch', 'diff', 'diagnostics'},
+            lualine_c = { project_plus_path},
+            lualine_x = {'encoding', 'fileformat', 'filetype'},
+            lualine_y = {'progress'},
+            lualine_z = {'location'}
+          },
+          inactive_sections = {
+            lualine_a = { {color = {fg = "#FF0000",bg = "None"}}},
+            lualine_b = { {color = {fg = "#FF0000",bg = "None"}}},
+            lualine_c = { project_plus_path},
+            lualine_x = { {color = {fg = "#FF0000",bg = "None"}}},
+            lualine_y = { {color = {fg = "#FF0000",bg = "None"}}},
+            lualine_z = { {color = {fg = "#FF0000",bg = "None"}}},
+          },
+        })
+	    end
     },
     {'simeji/winresizer'},
     {
@@ -215,10 +349,10 @@ require("lazy").setup({
           auto_save = false,
           auto_restore = false,
           pre_save_cmds = {
-            "tabdo Neotree close" -- Close NERDTree before saving session
+            -- "tabdo neotree close" -- close nerdtree before saving session
           },
           pre_restore_cmds= {
-            "tabdo Neotree close" -- Close NERDTree before saving session
+            -- "tabdo neotree close" -- close nerdtree before saving session
           },
         })
       end
@@ -227,7 +361,7 @@ require("lazy").setup({
     {
       'stevearc/oil.nvim',
       ---@module 'oil'
-      ---@type oil.SetupOpts
+      ---@type oil.setupopts
       opts = {
           default_file_explorer = true,
           columns = {
@@ -237,10 +371,10 @@ require("lazy").setup({
             "mtime",
           },
           keymaps = {
-              ["ot"] = { desc = "Open ToggleTerm", mode = "n",
+              ["ot"] = { desc = "open toggleterm", mode = "n",
                   callback = function()
                     local dir = require("oil").get_current_dir()
-                    vim.cmd("ToggleTerm dir=" .. vim.fn.fnameescape(dir))
+                    vim.cmd("toggleterm dir=" .. vim.fn.fnameescape(dir))
                   end,
                 },
               ["g?"] = { "actions.show_help", mode = "n" },
@@ -307,6 +441,9 @@ require("lazy").setup({
         },
         window = {
           position ="float",
+          mappings = {
+            ["<C-c>"] = "close_window",
+          },
         },
       },
     },
