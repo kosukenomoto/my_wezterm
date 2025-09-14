@@ -207,6 +207,7 @@ keymap("n", "<leader>w", ":w<cr>", opts)
 --keymap("n", "<leader>e", "<cmd>Neotree toggle<cr>", opts)
 keymap("n", "<leader>o", "<cmd>Oil<cr>", opts)
 
+
 vim.keymap.set("n", "sd", "<cmd>Telescope oldfiles<cr>", opts)
 vim.keymap.set("n", "sf", function()
   -- 現在 oil バッファかどうか判定
@@ -235,6 +236,35 @@ vim.keymap.set("n", "st", function()
     vim.cmd("ToggleTerm dir=" .. dir)
   end
 end, { desc = "Open ToggleTerm in current Oil dir" })
+
+-- 常に「新規」ターミナルを、その時点のディレクトリで開く
+vim.keymap.set({ "n", "t" }, "<leader>th", function()
+  -- dir を決める（OilならOilのdir／それ以外は開いてるファイルのdir、なければCWD）
+  local dir
+  local ok, oil = pcall(require, "oil")
+  if ok and vim.bo.filetype == "oil" then
+    dir = oil.get_current_dir()
+    if dir and dir:sub(-1) == "/" then dir = dir:sub(1, -2) end -- 末尾スラッシュ除去（任意）
+  else
+    dir = vim.fn.expand("%:p:h")
+    if dir == "" then dir = vim.loop.cwd() end
+  end
+  if not dir or dir == "" then
+    vim.notify("directory not found", vim.log.levels.WARN)
+    return
+  end
+
+  -- ここがポイント：毎回 new() で“新しい”ターミナルを作る
+  require("toggleterm.terminal").Terminal:new({
+    dir = dir,
+    direction = "horizontal", -- "vertical" / "float" / "tab" に好みで変更
+    -- size = math.floor(vim.o.lines * 0.3),  -- 横分割時の高さを調整したい場合
+  }):toggle()
+
+  -- 並べたときに見やすくする（任意）
+  vim.cmd("wincmd J")
+  vim.cmd("wincmd =")
+end, { desc = "Open NEW ToggleTerm in Oil/current file dir" })
 
 -- Split window
 keymap("n", "ss", ":split<Return><C-w>w", opts)
