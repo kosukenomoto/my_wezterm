@@ -198,6 +198,10 @@ keymap("n", "<Esc><Esc>", ":<C-u>set nohlsearch<Return>", opts)
 -- jjでesc
 keymap("i", "jj", "<ESC>", opts)
 
+vim.keymap.set("n", "<leader>c", "zz", { desc = "カーソル行を中央へ" })
+vim.keymap.set("n", "n", "nzz", { desc = "カーソル行を中央へ" })
+vim.keymap.set("n", "N", "Nzz", { desc = "カーソル行を中央へ" })
+
 vim.keymap.set("n", "<leader>q", "<Cmd>qa!<CR>", { desc = "Quit all without saving" })
 keymap("n", "<leader>w", ":w<cr>", opts)
 --keymap("n", "<leader>e", "<cmd>Neotree toggle<cr>", opts)
