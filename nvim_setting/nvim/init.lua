@@ -238,7 +238,7 @@ vim.keymap.set("n", "st", function()
 end, { desc = "Open ToggleTerm in current Oil dir" })
 
 -- 常に「新規」ターミナルを、その時点のディレクトリで開く
-vim.keymap.set({ "n", "t" }, "<leader>th", function()
+vim.keymap.set({ "n" }, "<leader>th", function()
   -- dir を決める（OilならOilのdir／それ以外は開いてるファイルのdir、なければCWD）
   local dir
   local ok, oil = pcall(require, "oil")
@@ -399,10 +399,10 @@ require("lazy").setup({
       opts = {
         style = "night",
         on_colors = function(colors)
-          colors.bg = "#050505"
-          colors.bg_float = "#050505"
-          colors.bg_sidebar = "#050505"
-          colors.bg_statusline = "#050505"
+          colors.bg = "#030303"
+          colors.bg_float = "#030303"
+          colors.bg_sidebar = "#030303"
+          colors.bg_statusline = "#030303"
         end,
       },
       config = function(_, opts)
@@ -410,7 +410,19 @@ require("lazy").setup({
         vim.cmd([[colorscheme tokyonight]])
       end,
     },
-    { 'tadaa/vimade', event = 'VeryLazy' },
+    {
+      'tadaa/vimade',
+      event = 'VeryLazy',
+      opts = {
+        recipe = { 'duo', { animate = true } }, -- ←好みで 'default' でもOK
+        ncmode = 'windows',                     -- 非アクティブ window を対象
+        fadelevel = 1.0,                        -- ほんの少し暗く（数値↑ほど暗くならない）
+        tint = {
+          fg = { desaturate = 0.5, intensity = 0.15 },
+          bg = {},
+        },
+      },
+    },
     {
       "nvim-lualine/lualine.nvim",
       dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -662,13 +674,13 @@ require("lazy").setup({
         })
       end,
     },
-    {
-      "saghen/blink.cmp",
-      version = "*", -- バイナリをダウンロードする場合
-      opts = {
-        -- 次の項目で紹介
-      },
-    },
+    -- {
+    --   "saghen/blink.cmp",
+    --   version = "*", -- バイナリをダウンロードする場合
+    --   opts = {
+    --     -- 次の項目で紹介
+    --   },
+    -- },
     {
       "lukas-reineke/indent-blankline.nvim",
       main = "ibl",

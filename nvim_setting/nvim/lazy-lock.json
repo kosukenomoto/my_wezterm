@@ -1,6 +1,5 @@
 {
-  "auto-session": { "branch": "main", "commit": "4be42f3cc862f129c2f872145aa12a1f7ccaaed9" },
-  "blink.cmp": { "branch": "main", "commit": "bae4bae0eedd1fa55f34b685862e94a222d5c6f8" },
+  "auto-session": { "branch": "main", "commit": "5a269bb5bec50b8b60564aa00f6454d9e82fbe8d" },
   "flash.nvim": { "branch": "main", "commit": "3c942666f115e2811e959eabbdd361a025db8b63" },
   "harpoon": { "branch": "harpoon2", "commit": "ed1f853847ffd04b2b61c314865665e1dadf22c7" },
   "indent-blankline.nvim": { "branch": "master", "commit": "005b56001b2cb30bfa61b7986bc50657816ba4ba" },
